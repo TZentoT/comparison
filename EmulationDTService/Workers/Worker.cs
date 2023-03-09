@@ -16,6 +16,8 @@ namespace EmulationDTService.Workers
         public static List<ChangeThread> _changeThreads = new List<ChangeThread>();
         public static List<MillStandEmulation> _millStandWork = new List<MillStandEmulation>();
         public static List<PresenceSensorEmulation> _presenceSensorWork = new List<PresenceSensorEmulation>();
+        public static Jace jaceImplement = new Jace();
+        public static NoString nostringImplement = new NoString();
         //public static DictionarySignals _signals;
         
         private readonly CancellationToken _cancellationToken = new();
@@ -60,6 +62,8 @@ namespace EmulationDTService.Workers
                     _signalInc.Add(new SignalInc(i.Id, i.Timer));
                 }
             }
+            //TODO запрос конфига(через подписчика, библиотека ParseMTSConnect, сервис OutSignalsEntities), просмотр сигналов, поиск сигналов с формулой, создание списка объектов для рассчетов(Jace и NoString)
+
             cfg.AddSignal(11001);
             cfg.AddSignal(11002);
             cfg.AddSignal(11003);
@@ -72,6 +76,11 @@ namespace EmulationDTService.Workers
             cfg.AddSignal(11010);
             cfg.AddSignal(11011);
             cfg.AddSignal(11012);
+
+            cfg.AddSignal(10003);
+            cfg.AddSignal(10004);
+            cfg.AddSignal(10005);
+            cfg.AddSignal(10006);
             _signalInc.Add(new SignalInc(11004, 5));//для идеального сигнала
 
             if (jsonClass1.Emulation.CreateIngot.Length > 0)
@@ -153,6 +162,11 @@ namespace EmulationDTService.Workers
                     pse.Action(e.State.Ingots);
                 }
             }
+            // Рассчет с помощью Jace
+            jaceImplement.calc(e.State.Signals[10003].Value, e.State.Signals[10004].Value, e.State.Signals[10005].Value, 0.2, Subs._s);
+
+            // Рассчет с помощью NoStringEvaluater
+            nostringImplement.calc(e.State.Signals[10003].Value, e.State.Signals[10004].Value, e.State.Signals[10005].Value, 0.2, Subs._s);
         }
          
          
